@@ -1,0 +1,74 @@
+{
+  "company": {
+    "name": "XY CARGO LIMITED",
+    "logoPath": "/Users/mac/.cursor/projects/Users-mac-developerr-Xycargo/assets/Screenshot_2026-04-09_at_02.48.53-9c64e067-009b-4cb9-8d2a-e984a2a700e1.png",
+    "offices": [
+      {
+        "name": "ZANZIBAR OFFICE",
+        "lines": [
+          "Kilimani Plaza, First Floor",
+          "Email: office@xy-cargo.com",
+          "+255775 746 430"
+        ]
+      },
+      {
+        "name": "DAR ES SALAAM OFFICE",
+        "lines": [
+          "Livingstone na Pemba",
+          "+255759 292 477"
+        ]
+      },
+      {
+        "name": "SOUTH KOREA OFFICE",
+        "lines": [
+          "77, Sindaebu-ro 209beon-gil, Jung-gu, Incheon"
+        ]
+      }
+    ],
+    "contacts": [
+      "Mr Hamid : +86 156 9183 3253",
+      "Mr Abdallah : +82 106 737 4220"
+    ]
+  },
+  "invoiceNo": "52977183",
+  "trackingNo": "2512082",
+  "shipping": "By Air",
+  "invoiceDate": "2026-03-30",
+  "dueDate": "2026-04-05",
+  "batchNo": "E075NC",
+  "exchangeRate": 1500,
+  "totalCurrency": "WON",
+  "billTo": {
+    "name": "BEN",
+    "phone": "+8221030152140"
+  },
+  "items": [
+    {
+      "packageName": "NORMAL GOODS",
+      "boxNo": "NO 2",
+      "weightKg": 55.6,
+      "cbm": 0,
+      "unitPriceUsd": 17
+    }
+  ],
+  "paymentDetails": [
+    {
+      "bank": "CRDB",
+      "currency": "TSH",
+      "accountName": "X.Y CARGO LIMITED",
+      "accountNumber": "10203456269"
+    },
+    {
+      "bank": "CRDB",
+      "currency": "USD",
+      "accountName": "X.Y CARGO LIMITED",
+      "accountNumber": "10202511286"
+    },
+    {
+      "bank": "KOOKMIN BANK",
+      "currency": "KRW",
+      "accountName": "MTAVYA ABD",
+      "accountNumber": "484602042555822"
+    }
+  ]
+}

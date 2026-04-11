@@ -1,0 +1,283 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Invoice {{invoiceNo}}</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 0;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        color: #1f2937;
+        font-size: 14px;
+      }
+      .page {
+        width: 210mm;
+        height: 297mm;
+        margin: 0 auto;
+        background: #fff;
+        border: 1px solid #d1d5db;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .header {
+        background: #1e88e5;
+        color: #fff;
+        padding: 12px 16px;
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        min-height: 150px;
+      }
+      .header-left {
+        width: 205px;
+        display: flex;
+        align-items: center;
+      }
+      .logo-box {
+        width: 162px;
+        height: 124px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px;
+        box-sizing: border-box;
+      }
+      .logo-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      .header-right {
+        flex: 1;
+        text-align: right;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 20px;
+        letter-spacing: 1px;
+        line-height: 1;
+      }
+      .office-block {
+        margin-top: 8px;
+        line-height: 1.25;
+        font-weight: 700;
+      }
+      .office-name {
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .office-line {
+        display: block;
+        margin-top: 1px;
+        font-size: 11px;
+        font-weight: 500;
+      }
+      .header-contact {
+        margin-top: 8px;
+        font-size: 10px;
+        line-height: 1.3;
+        font-weight: 500;
+      }
+      .section {
+        padding: 14px 12px 12px;
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .billto { flex: 0 0 56%; }
+      .meta {
+        flex: 0 0 40%;
+        margin-left: auto;
+        text-align: right;
+      }
+      .title {
+        color: #1e88e5;
+        font-weight: bold;
+        margin-bottom: 10px;
+        font-size: 28px;
+      }
+      .invoice-title {
+        text-align: center;
+        margin-bottom: 14px;
+        color: #1e88e5;
+        font-weight: 700;
+        font-size: 34px;
+        letter-spacing: 0.6px;
+      }
+      .invoice-subtitle {
+        display: block;
+        margin-top: 3px;
+        font-size: 20px;
+        font-weight: 500;
+        text-transform: uppercase;
+      }
+      .meta p, .billto p {
+        margin: 5px 0;
+        font-size: 18px;
+        line-height: 1.28;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+        font-size: 16px;
+      }
+      th, td {
+        border: 1px solid #d1d5db;
+        padding: 10px 8px;
+        text-align: left;
+      }
+      th {
+        background: #1e88e5;
+        color: #fff;
+        font-size: 16px;
+      }
+      .totals {
+        background: #f3f4f6;
+        padding: 10px 10px;
+        margin-top: 8px;
+        display: flex;
+        justify-content: space-between;
+        font-weight: bold;
+        font-size: 18px;
+      }
+      .payment {
+        background: #f9fafb;
+        border-top: 2px solid #1e88e5;
+        margin-top: 6px;
+        padding: 12px 14px;
+        font-size: 15px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .payment h3 {
+        margin: 0 0 8px;
+        color: #1e88e5;
+        font-size: 36px;
+      }
+      .payment p {
+        margin: 6px 0;
+        line-height: 1.35;
+      }
+      .footer {
+        background: #1e88e5;
+        color: #fff;
+        text-align: center;
+        padding: 20px 12px;
+        margin-top: 0;
+        font-style: italic;
+        font-size: 20px;
+        line-height: 1.35;
+        font-weight: 600;
+      }
+      .right { text-align: right; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="header">
+        <div class="header-left">
+          <div class="logo-box">
+            <img src="{{company.logoSrc}}" alt="Company logo" />
+          </div>
+        </div>
+        <div class="header-right">
+          <h1>{{company.name}}</h1>
+          {{#each company.offices}}
+            <div class="office-block">
+              <div class="office-name">{{name}}</div>
+              {{#each lines}}
+                <span class="office-line">{{this}}</span>
+              {{/each}}
+            </div>
+          {{/each}}
+          <div class="header-contact">
+            {{#each company.contacts}}
+              <div>{{this}}</div>
+            {{/each}}
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="invoice-title">
+          TAX INVOICE
+          <span class="invoice-subtitle">✈ {{shipping}}</span>
+        </div>
+        <div class="row">
+          <div class="col billto">
+            <div class="title">BILL TO</div>
+            <p><b>Name:</b> {{billTo.name}}</p>
+            <p><b>Phone:</b> {{billTo.phone}}</p>
+          </div>
+          <div class="col meta">
+            <p><b>Invoice No:</b> {{invoiceNo}}</p>
+            <p><b>Tracking No:</b> {{trackingNo}}</p>
+            <p><b>Shipping:</b> {{shipping}}</p>
+            <p><b>Invoice Date:</b> {{invoiceDate}}</p>
+            <p><b>Due Date:</b> {{dueDate}}</p>
+            <p><b>Batch No:</b> {{batchNo}}</p>
+            <p><b>Exchange Rate:</b> {{exchangeRate}}</p>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Package Name</th>
+              <th>Box No</th>
+              <th>Weight (KG)</th>
+              <th>CBM</th>
+              <th>Unit Price (USD)</th>
+              <th>Amount (USD)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each items}}
+            <tr>
+              <td>{{inc @index}}</td>
+              <td>{{packageName}}</td>
+              <td>{{boxNo}}</td>
+              <td>{{weightKg}}</td>
+              <td>{{cbm}}</td>
+              <td class="right">{{unitPriceUsd}}</td>
+              <td class="right">{{amountUsd}}</td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+
+        <div class="totals">
+          <div>Total Weight: {{totalWeight}} KG | Total CBM: {{totalCbm}}</div>
+          <div>Total Amount: {{totalCurrency}} {{totalAmountWon}}</div>
+        </div>
+      </div>
+
+      <div class="payment">
+        <h3>PAYMENT DETAILS</h3>
+        <p>Payment should be made to:</p>
+        {{#each paymentDetails}}
+          <p><b>{{bank}} ({{currency}})</b> - {{accountName}} - <b>{{accountNumber}}</b></p>
+        {{/each}}
+      </div>
+
+      <div class="footer">
+        Thank you for your business. Payment is due by the specified due date.<br />
+        "NO DELAY NO DEBATE"
+      </div>
+    </div>
+  </body>
+</html>
