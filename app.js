@@ -1,13 +1,12 @@
 const fs = require("fs");
 const path = require("path");
 const express = require("express");
-const { generateInvoicePdf } = require("./generate");
+const { generateInvoiceBuffer } = require("./generate");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.urlencoded({ extended: true }));
-app.use("/output", express.static(path.resolve("output")));
 
 const baseInvoicePath = path.resolve("data/invoice.sample.json");
 
@@ -165,10 +164,10 @@ app.post("/generate", async (req, res) => {
       items: items.length ? items : base.items
     };
 
-    const outputPath = await generateInvoicePdf(invoice);
-    const fileName = path.basename(outputPath);
-    const msg = `Generated: <a href="/output/${fileName}" target="_blank">${fileName}</a>`;
-    res.send(formPage(invoice, msg));
+    const { fileName, pdfBuffer } = await generateInvoiceBuffer(invoice);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `inline; filename=\"${fileName}\"`);
+    res.send(pdfBuffer);
   } catch (error) {
     res.status(500).send(`Failed to generate invoice: ${error.message}`);
   }
