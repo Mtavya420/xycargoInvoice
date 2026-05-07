@@ -1,7 +1,9 @@
 const fs = require("fs");
 const path = require("path");
 const Handlebars = require("handlebars");
-const { chromium } = require("playwright");
+const { chromium: playwrightChromium } = require("playwright");
+const { chromium: playwrightCoreChromium } = require("playwright-core");
+const chromium = require("@sparticuz/chromium");
 
 Handlebars.registerHelper("inc", function (value) {
   return parseInt(value, 10) + 1;
@@ -98,31 +100,67 @@ function renderInvoiceHtml(invoiceData) {
   return { computed, html: template(computed) };
 }
 
-async function generateInvoicePdf(invoiceData, outputPath) {
-  const { computed, html } = renderInvoiceHtml(invoiceData);
-  const outputDir = path.resolve("output");
-  if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
-  const pdfPath = outputPath || path.join(outputDir, `invoice-${computed.invoiceNo}.pdf`);
+function isServerlessRuntime() {
+  return Boolean(
+    process.env.VERCEL ||
+    process.env.AWS_REGION ||
+    process.env.AWS_EXECUTION_ENV ||
+    process.env.LAMBDA_TASK_ROOT
+  );
+}
 
-  const browser = await chromium.launch();
+async function launchBrowser() {
+  if (isServerlessRuntime()) {
+    const executablePath = await chromium.executablePath();
+    return playwrightCoreChromium.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath,
+      headless: chromium.headless
+    });
+  }
+
+  return playwrightChromium.launch();
+}
+
+async function buildPdf(invoiceData) {
+  const { computed, html } = renderInvoiceHtml(invoiceData);
+  const browser = await launchBrowser();
   try {
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: "networkidle" });
-    await page.pdf({
-      path: pdfPath,
+    const pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true,
       margin: { top: "10mm", right: "10mm", bottom: "10mm", left: "10mm" }
     });
+    return { computed, pdfBuffer };
   } finally {
     await browser.close();
   }
+}
+
+async function generateInvoiceBuffer(invoiceData) {
+  const { computed, pdfBuffer } = await buildPdf(invoiceData);
+  return {
+    fileName: `invoice-${computed.invoiceNo}.pdf`,
+    pdfBuffer
+  };
+}
+
+async function generateInvoicePdf(invoiceData, outputPath) {
+  const { computed, pdfBuffer } = await buildPdf(invoiceData);
+  const outputDir = path.resolve("output");
+  if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
+  const pdfPath = outputPath || path.join(outputDir, `invoice-${computed.invoiceNo}.pdf`);
+  fs.writeFileSync(pdfPath, pdfBuffer);
   return pdfPath;
 }
 
 module.exports = {
   computeInvoice,
   renderInvoiceHtml,
+  generateInvoiceBuffer,
   generateInvoicePdf
 };
 
