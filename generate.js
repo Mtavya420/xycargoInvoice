@@ -27,7 +27,9 @@ function extToMime(filePath) {
 
 function getLogoDataUri(logoPath) {
   if (!logoPath) return "";
-  const absoluteLogoPath = path.resolve(logoPath);
+  const absoluteLogoPath = path.isAbsolute(logoPath)
+    ? logoPath
+    : path.resolve(__dirname, logoPath);
   if (!fs.existsSync(absoluteLogoPath)) return "";
   const mime = extToMime(absoluteLogoPath);
   const buffer = fs.readFileSync(absoluteLogoPath);
