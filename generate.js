@@ -5,6 +5,9 @@ const { chromium: playwrightChromium } = require("playwright");
 const { chromium: playwrightCoreChromium } = require("playwright-core");
 const chromium = require("@sparticuz/chromium");
 
+const TEMPLATE_PATH = path.join(__dirname, "template.html");
+const DEFAULT_LOGO_PATH = path.join(__dirname, "assets", "company-logo.png");
+
 Handlebars.registerHelper("inc", function (value) {
   return parseInt(value, 10) + 1;
 });
@@ -25,11 +28,21 @@ function extToMime(filePath) {
   return "application/octet-stream";
 }
 
+function resolveLogoPath(logoPath) {
+  const candidates = [];
+
+  if (logoPath) {
+    candidates.push(path.isAbsolute(logoPath) ? logoPath : path.resolve(__dirname, logoPath));
+  }
+
+  candidates.push(DEFAULT_LOGO_PATH);
+
+  return candidates.find((candidate) => fs.existsSync(candidate)) || "";
+}
+
 function getLogoDataUri(logoPath) {
-  if (!logoPath) return "";
-  const absoluteLogoPath = path.isAbsolute(logoPath)
-    ? logoPath
-    : path.resolve(__dirname, logoPath);
+  const absoluteLogoPath = resolveLogoPath(logoPath);
+  if (!absoluteLogoPath) return "";
   if (!fs.existsSync(absoluteLogoPath)) return "";
   const mime = extToMime(absoluteLogoPath);
   const buffer = fs.readFileSync(absoluteLogoPath);
@@ -95,8 +108,7 @@ async function main() {
 }
 
 function renderInvoiceHtml(invoiceData) {
-  const templatePath = path.resolve("template.html");
-  const templateSource = fs.readFileSync(templatePath, "utf-8");
+  const templateSource = fs.readFileSync(TEMPLATE_PATH, "utf-8");
   const template = Handlebars.compile(templateSource);
   const computed = computeInvoice(invoiceData);
   return { computed, html: template(computed) };
