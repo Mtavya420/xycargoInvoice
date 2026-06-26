@@ -57,15 +57,7 @@ function getPaymentDetails(paymentDetails, totalCurrency) {
   });
 
   if (normalizedCurrency === "TSH") {
-    return [
-      ...basePaymentDetails,
-      {
-        bank: "LIPA NAMBA",
-        currency: "TSH",
-        accountName: "XY CARGO COMPANY LIMITED",
-        accountNumber: "43987034"
-      }
-    ];
+    return basePaymentDetails;
   }
 
   if (normalizedCurrency === "WON") {
