@@ -49,10 +49,37 @@ function getLogoDataUri(logoPath) {
   return `data:${mime};base64,${buffer.toString("base64")}`;
 }
 
+function getPaymentDetails(paymentDetails, totalCurrency) {
+  const normalizedCurrency = String(totalCurrency || "WON").toUpperCase();
+  const basePaymentDetails = (paymentDetails || []).filter((detail) => {
+    const bank = String(detail.bank || "").toUpperCase();
+    return bank !== "KOOKMIN BANK" && bank !== "LIPA NAMBA";
+  });
+
+  if (normalizedCurrency === "TSH") {
+    return basePaymentDetails;
+  }
+
+  if (normalizedCurrency === "WON") {
+    return [
+      ...basePaymentDetails,
+      {
+        bank: "KOOKMIN BANK",
+        currency: "KRW",
+        accountName: "MTAVYA ABD",
+        accountNumber: "48460204255822"
+      }
+    ];
+  }
+
+  return basePaymentDetails;
+}
+
 function computeInvoice(data) {
   const shippingMode = String(data.shipping || "").trim().toUpperCase();
   const isSea = shippingMode === "BY SEA";
   const amountBaseKey = isSea ? "cbm" : "weightKg";
+  const totalCurrency = String(data.totalCurrency || "WON").toUpperCase();
 
   const items = data.items.map((item) => {
     const amountBase = Number(item[amountBaseKey] || 0);
@@ -78,7 +105,8 @@ function computeInvoice(data) {
       logoSrc: getLogoDataUri(data.company && data.company.logoPath)
     },
     items,
-    totalCurrency: String(data.totalCurrency || "WON").toUpperCase(),
+    paymentDetails: getPaymentDetails(data.paymentDetails, totalCurrency),
+    totalCurrency,
     totalWeight: formatNumber(totalWeight),
     totalCbm: formatNumber(totalCbm),
     totalAmountUsd: formatNumber(totalAmountUsdRaw),
